@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hybrid ER | Virtual Escape Room</title>
+    <link rel="stylesheet" href="app.css?v=3" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <main class="app-frame">
+        <section class="screen active" id="screen-intro" aria-labelledby="intro-title">
+          <div class="panel intro-panel">
+            <img
+              class="top-banner"
+              src="HER-resources/HybridEV_introbanner.png"
+              alt="Hybrid Escape Venture intro banner"
+            />
+
+            <div class="intro-layout">
+              <div class="intro-copy">
+                <h1 id="intro-title">The City Is About To Be Taken</h1>
+                <p>
+                  It is 1926. The city is divided between rival underground families. Your group has learned that
+                  a competing gang is about to seize control using a carefully coordinated operation. The details
+                  of the plot have been split across four protected locations so that no single informant can
+                  betray the full plan.
+                </p>
+                <p>
+                  Your team must search the city, decode hidden evidence, and recover the four fragments before
+                  the rival gang closes in. Every clue is concealed within anatomical puzzles, physiological
+                  consequences, and coded case files. Solve the leads, assemble the fragments, and uncover the
+                  final plan before time runs out.
+                </p>
+
+                <div class="setup-card" aria-labelledby="setup-title">
+                  <h2 id="setup-title">Create Your Team</h2>
+                  <div class="setup-field">
+                    <label for="teamNameInput">Team name</label>
+                    <input
+                      id="teamNameInput"
+                      class="team-select"
+                      type="text"
+                      maxlength="80"
+                      autocomplete="off"
+                      placeholder="Enter your team name"
+                    />
+                  </div>
+
+                  <div class="setup-field">
+                    <p class="meta-label">Choose one avatar</p>
+                    <div id="avatarGrid" class="avatar-grid" role="radiogroup" aria-label="Choose an avatar"></div>
+                  </div>
+
+                  <p id="setupError" class="setup-error" role="alert" hidden></p>
+                </div>
+
+                <div class="team-strip">
+                  <div>
+                    <p class="meta-label">Selected team</p>
+                    <p id="teamSummary" class="team-summary">Create a team to begin the briefing.</p>
+                  </div>
+                  <div class="avatar-preview-wrap">
+                    <img id="avatarPreview" class="avatar-preview" alt="Selected team avatar" />
+                  </div>
+                </div>
+
+                <button id="startGameBtn" class="image-btn start-btn" type="button" disabled aria-label="Start">
+                  <img src="HER-resources/start_button.png" alt="" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-instructions" aria-labelledby="instructions-title">
+          <div class="panel instructions-panel">
+            <img
+              class="top-banner"
+              src="HER-resources/HybridEV_introbanner.png"
+              alt="Hybrid Escape Venture intro banner"
+            />
+
+            <div class="instructions-card">
+              <h2 id="instructions-title">Instructions</h2>
+              <div class="instruction-list">
+                <article>
+                  <h3>1. Choose any open location</h3>
+                  <p>
+                    Your team can begin in any accessible district on the city map. One location is blocked and
+                    cannot be entered.
+                  </p>
+                </article>
+                <article>
+                  <h3>2. Solve the case file</h3>
+                  <p>
+                    Each room contains anatomical and physiology-based evidence. Submit the correct answer using
+                    the next button.
+                  </p>
+                </article>
+                <article>
+                  <h3>3. Collect the lock clues</h3>
+                  <p>
+                    Every completed district gives your team one fragment and one clue for the final physical
+                    lock.
+                  </p>
+                </article>
+              </div>
+
+              <button
+                id="continueToMapBtn"
+                class="image-btn next-btn"
+                type="button"
+                aria-label="Continue to map"
+              >
+                <img src="HER-resources/Next_button.png" alt="" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-map" aria-labelledby="map-title">
+          <div class="panel map-panel">
+            <img
+              class="top-banner"
+              src="HER-resources/HybridEV_introbanner.png"
+              alt="Hybrid Escape Venture intro banner"
+            />
+
+            <div class="map-layout">
+              <aside class="sidebar-card">
+                <h2 id="map-title">Mission Board</h2>
+                <div class="sidebar-block">
+                  <span>Team</span>
+                  <strong id="hudTeamName">-</strong>
+                </div>
+                <div class="sidebar-block">
+                  <span>Progress</span>
+                  <strong id="hudProgress">0 / 4</strong>
+                </div>
+                <div class="sidebar-block">
+                  <span>Life Points</span>
+                  <div class="life-meter" aria-label="Life points">
+                    <div id="hudLifeFill" class="life-fill"></div>
+                    <strong id="hudLife" class="life-value">150</strong>
+                  </div>
+                </div>
+                <div class="sidebar-block">
+                  <span>Time Remaining</span>
+                  <strong id="hudTimer">40:00</strong>
+                </div>
+                <div class="sidebar-block">
+                  <span>Status</span>
+                  <strong id="hudStatus">Choose a district.</strong>
+                </div>
+
+                <div class="sidebar-notes">
+                  <p class="meta-label">Final lock hints</p>
+                  <ul id="hintList" class="hint-list"></ul>
+                </div>
+
+                <div id="mapDebugPanel" class="sidebar-card debug-panel" hidden>
+                  <p class="meta-label">Map Debug</p>
+                  <div class="sidebar-block">
+                    <span>Selected location</span>
+                    <select id="mapDebugTarget" class="dropdown-field">
+                      <option value="warehouse">Warehouse</option>
+                      <option value="cave">Cave</option>
+                      <option value="fightclub">Fightclub</option>
+                      <option value="pub">Pub</option>
+                      <option value="docks">Docks</option>
+                    </select>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Pixel coordinates</span>
+                    <strong id="mapDebugCoords">x: -, y: -</strong>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Percent coordinates</span>
+                    <strong id="mapDebugPercents">x: -, y: -</strong>
+                  </div>
+                  <p class="debug-note">
+                    Click on the map image to move the selected location button. Keep the percentage values for the
+                    final hotspot positions.
+                  </p>
+                </div>
+
+                <button
+                  class="image-btn sidebar-restart-btn"
+                  type="button"
+                  data-restart-game
+                  aria-label="Restart game"
+                >
+                  <img src="HER-resources/restart_button.png" alt="" />
+                </button>
+              </aside>
+
+              <div class="map-card">
+                <div class="city-map" id="cityMap" aria-label="City map">
+                  <img
+                    class="map-image"
+                    src="HER-resources/virtualescaperoom -map.png"
+                    alt="City map with warehouse, cave, fightclub, pub and docks"
+                  />
+
+                  <div id="mapAvatar" class="map-avatar" aria-hidden="true">
+                    <img id="mapAvatarImg" alt="" />
+                  </div>
+
+                  <button class="map-hotspot" data-room-id="warehouse" style="--x: 15.3%; --y: 15.6%;">
+                    <span>Warehouse</span>
+                  </button>
+                  <button class="map-hotspot blocked" data-room-id="cave" style="--x: 48.5%; --y: 15.5%;">
+                    <span>Cave</span>
+                  </button>
+                  <button class="map-hotspot" data-room-id="fightclub" style="--x: 64.0%; --y: 55.6%;">
+                    <span>Fightclub</span>
+                  </button>
+                  <button class="map-hotspot" data-room-id="pub" style="--x: 16.2%; --y: 63.8%;">
+                    <span>Pub</span>
+                  </button>
+                  <button class="map-hotspot" data-room-id="docks" style="--x: 82.4%; --y: 84.7%;">
+                    <span>Docks</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-room" aria-labelledby="room-title">
+          <div class="panel question-panel">
+            <img
+              class="top-banner"
+              src="HER-resources/HybridEV_introbanner.png"
+              alt="Hybrid Escape Venture intro banner"
+            />
+
+            <div class="question-layout">
+              <div class="question-main">
+                <div class="question-header">
+                  <div>
+                    <p class="meta-label" id="roomDistrictTag">District File</p>
+                    <h2 id="room-title">Warehouse</h2>
+                  </div>
+                  <button id="backToMapBtn" class="image-btn back-btn" type="button" aria-label="Back to map">
+                    <img src="HER-resources/back_button.png" alt="" />
+                  </button>
+                </div>
+
+                <div class="room-stage">
+                  <img id="roomSceneImage" class="room-scene-image" alt="Room scene" />
+                  <div id="roomAvatar" class="room-avatar" aria-hidden="true">
+                    <img id="roomAvatarImg" alt="" />
+                  </div>
+                </div>
+
+                <div class="question-copy">
+                  <p id="questionStepLabel" class="meta-label">Question 1 of 1</p>
+                  <p id="roomIntro" class="room-intro"></p>
+                  <div class="question-box">
+                    <p id="roomQuestion"></p>
+                  </div>
+                </div>
+
+                <form id="answerForm" class="answer-form answer-form-inline">
+                  <label id="answerLabel" for="dynamicAnswerInput">Enter your answer</label>
+                  <div id="answerFields"></div>
+                  <button class="image-btn next-btn submit-btn" type="submit" aria-label="Submit answer">
+                    <img src="HER-resources/Next_button.png" alt="" />
+                  </button>
+                </form>
+              </div>
+
+              <aside class="question-sidebar">
+                <div class="sidebar-card compact">
+                  <div class="sidebar-block">
+                    <span>Team</span>
+                    <strong id="roomTeamName">-</strong>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Fragments</span>
+                    <strong id="roomProgress">0 / 4</strong>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Life Points</span>
+                    <div class="life-meter" aria-label="Life points">
+                      <div id="roomLifeFill" class="life-fill"></div>
+                      <strong id="roomLife" class="life-value">150</strong>
+                    </div>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Time Remaining</span>
+                    <strong id="roomTimer">40:00</strong>
+                  </div>
+                  <div class="sidebar-notes">
+                    <p class="meta-label">Recovered hints</p>
+                    <ul id="roomHintList" class="hint-list"></ul>
+                  </div>
+
+                  <button
+                    class="image-btn sidebar-restart-btn"
+                    type="button"
+                    data-restart-game
+                    aria-label="Restart game"
+                  >
+                    <img src="HER-resources/restart_button.png" alt="" />
+                  </button>
+                </div>
+
+                <div id="debugPanel" class="sidebar-card debug-panel" hidden>
+                  <p class="meta-label">Debug Mode</p>
+                  <div class="sidebar-block">
+                    <span>Room</span>
+                    <strong id="debugRoomName">-</strong>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Pixel coordinates</span>
+                    <strong id="debugCoords">x: -, y: -</strong>
+                  </div>
+                  <div class="sidebar-block">
+                    <span>Percent coordinates</span>
+                    <strong id="debugPercents">x: -, y: -</strong>
+                  </div>
+                  <p class="debug-note">
+                    Click on the room image to move the avatar. Keep the percentage values for the final positions.
+                  </p>
+                </div>
+
+                <p id="answerFeedback" class="answer-feedback" aria-live="polite"></p>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-finale" aria-labelledby="finale-title">
+          <div class="panel finale-panel">
+            <div id="finaleConfetti" class="finale-confetti" aria-hidden="true"></div>
+            <img
+              class="top-banner"
+              src="HER-resources/HybridEV_introbanner.png"
+              alt="Hybrid Escape Venture intro banner"
+            />
+
+            <div class="finale-card">
+              <h2 id="finale-title">Case Closed</h2>
+              <div class="finale-message">
+                <p>Congratulations, team.</p>
+                <p>
+                  You recovered all the territories, solved the hidden clues, and proved that your anatomy
+                  knowledge was strong enough to outsmart the rival gang. For now, the city is safe, and your
+                  crew can finally breathe.
+                </p>
+                <p>
+                  But stay alert. In this city, peace never lasts forever. Soon, another gang may rise from the
+                  shadows, ready to challenge your anatomical skills once again.
+                </p>
+                <p>Rest while you can.</p>
+                <p>See you next semester.</p>
+              </div>
+              <div id="finalFragments" class="final-fragments"></div>
+              <div class="sidebar-notes">
+                <p class="meta-label">Recovered clues</p>
+                <ul id="finalHintList" class="hint-list"></ul>
+              </div>
+              <button id="restartBtn" class="image-btn sidebar-restart-btn finale-restart-btn" type="button" aria-label="Restart game">
+                <img src="HER-resources/restart_button.png" alt="" />
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      window.ESCAPE_ROOM_SHEET_API_URL =
+        window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
+          ? "/sheet-api"
+          : "https://script.google.com/macros/s/AKfycbxlRsUc7xQxDBOC2qjZ-kom-0cuiCSBHckugOvkQNIT9f8d_aO4wLwWBrqQgo8WhXZu/exec";
+    </script>
+    <script src="app.js?v=5"></script>
+  </body>
+</html>
